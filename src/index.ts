@@ -1,19 +1,24 @@
 import express from 'express';
 import type {Request, Response} from 'express';
 
-const app = express();
+export const app = express();
 const port = process.env.PORT || 3000;
 const jsonMiddleware = express.json();
 
 app.use(jsonMiddleware);
 
-const HTTP_STATUS = {
+export const HTTP_STATUS = {
 	OK_200: 200,
 	CREATED_201: 201,
 	NO_CONTENT_204: 204,
 
 	BAD_REQUEST_400: 400,
 	NOT_FOUND_404: 404,
+};
+
+export type DbUser = {
+	id: number;
+	name: string;
 };
 
 const db = {
@@ -85,4 +90,10 @@ app.delete('/users/:id', (req: Request, res: Response) => {
 
 app.listen(port, () => {
 	console.log(`The app listening on port ${port}`)
+});
+
+
+app.delete('/__test__', (req: Request, res: Response) => {
+	db.users = [];
+	res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
 });
