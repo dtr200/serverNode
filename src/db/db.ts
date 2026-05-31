@@ -1,4 +1,4 @@
-type DbUser = {
+export type DbUser = {
 	id: number;
 	name: string;
 };

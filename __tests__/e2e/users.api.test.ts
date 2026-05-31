@@ -3,7 +3,8 @@ import request from 'supertest';
 import {app} from '../../src/app.js';
 import {ENDPOINT, HTTP_STATUS} from '../../src/types.js';
 import {ERROR_URI} from './types.js';
-import type {DbUser, UserCreator} from './types.js';
+import type {UserCreator} from './types.js';
+import {DbUser} from '../../src/db/db.js';
 
 describe('/users', () => {
 	const USER: UserCreator = {
@@ -36,8 +37,8 @@ describe('/users', () => {
 			.expect(HTTP_STATUS.NOT_FOUND_404)
 	});
 
-	let createdUser: DbUser = null;
-	let createdUser2: DbUser = null;
+	let createdUser: DbUser | null = null;
+	let createdUser2: DbUser | null = null;
 
 	it('Creating a new user and trying to get it back with checking if it was added succesfully', async () => {
 		const createdUserRes = await request(app)
