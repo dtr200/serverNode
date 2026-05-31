@@ -1,16 +1,11 @@
 import {describe, it, expect} from '@jest/globals';
 import request from 'supertest';
-import {app, HTTP_STATUS} from '../../src/index.js';
-import type {DbUser} from '../../src/index.js';
-
-const ERROR_URI = -1;
-enum ENDPOINT {
-	Test = '__test__',
-	Users = 'users',
-}
+import {app} from '../../src/index.js';
+import {HTTP_STATUS} from '../../src/types.js';
+import {ENDPOINT, ERROR_URI, type DbUser, type UserCreator} from './types.js';
 
 describe('/users', () => {
-	const USER = {
+	const USER: UserCreator = {
 		toCreate: {
 			first: {name: 'Aditya'},
 			second: {name: 'Martin'},
@@ -40,8 +35,8 @@ describe('/users', () => {
 			.expect(HTTP_STATUS.NOT_FOUND_404)
 	});
 
-	let createdUser: DbUser | null = null;
-	let createdUser2: DbUser | null = null;
+	let createdUser: DbUser = null;
+	let createdUser2: DbUser = null;
 
 	it('Creating a new user and trying to get it back with checking if it was added succesfully', async () => {
 		const createdUserRes = await request(app)
@@ -67,7 +62,7 @@ describe('/users', () => {
 			.send(USER.toCreate.second)
 			.expect(HTTP_STATUS.CREATED_201)
 
-		const createdUser2 = createdUserRes.body;
+		createdUser2 = createdUserRes.body;
 		await request(app)
 			.get(`/${ENDPOINT.Users}`)
 			.expect(HTTP_STATUS.OK_200)

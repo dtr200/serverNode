@@ -1,5 +1,11 @@
 import express from 'express';
 import type {Request, Response} from 'express';
+import {HTTP_STATUS, type Db, type RequestWithBody, type RequestWithParams, type RequestWithQuery} from './types.js';
+import type {UserCreateModel} from './models/userCreateModel.js';
+import type {UserUpdateModel} from './models/userUpdateModel.js';
+import type {UserQueryModel} from './models/userQueryModel.js';
+import type {UserViewModel} from './models/userViewModel.js';
+import type {UserUriParamsModel} from './models/userUriParamsModel.js';
 
 export const app = express();
 const port = process.env.PORT || 3000;
@@ -7,21 +13,7 @@ const jsonMiddleware = express.json();
 
 app.use(jsonMiddleware);
 
-export const HTTP_STATUS = {
-	OK_200: 200,
-	CREATED_201: 201,
-	NO_CONTENT_204: 204,
-
-	BAD_REQUEST_400: 400,
-	NOT_FOUND_404: 404,
-};
-
-export type DbUser = {
-	id: number;
-	name: string;
-};
-
-const db = {
+const db: Db = {
 	users: [
 		{id: 1, name: 'Maria'},
 		{id: 2, name: 'John'},
@@ -30,7 +22,7 @@ const db = {
 	],
 };
 
-app.post('/users', (req: Request, res: Response) => {
+app.post('/users', (req: RequestWithBody<UserCreateModel>, res: Response) => {
 	const name = req.body.name as string;
 	if (!name) {
 		res.sendStatus(HTTP_STATUS.BAD_REQUEST_400);
@@ -41,7 +33,7 @@ app.post('/users', (req: Request, res: Response) => {
 	res.status(HTTP_STATUS.CREATED_201).json(user);
 });
 
-app.get('/users', (req: Request, res: Response) => {
+app.get('/users', (req: RequestWithQuery<UserQueryModel>, res: Response<UserViewModel[]>) => {
 	const name = req.query.name as string;
 	let retval = db.users;
 	if (!name) {
@@ -51,7 +43,7 @@ app.get('/users', (req: Request, res: Response) => {
 	retval = db.users.filter((u) => u.name.toLowerCase().indexOf(name.toLowerCase()) > -1);
 	return res.json(retval);
 });
-app.get('/users/:id', (req: Request, res: Response) => {
+app.get('/users/:id', (req: RequestWithParams<UserUriParamsModel>, res: Response<UserViewModel>) => {
 	const user = db.users.find((u) => `${u.id}` === req.params.id);
 	if (!user) {
 		res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
@@ -60,8 +52,8 @@ app.get('/users/:id', (req: Request, res: Response) => {
 	res.json(user);
 });
 
-app.put('/users/:id', (req: Request, res: Response) => {
-	const userId = req.params.id as string;
+app.put('/users/:id', (req: RequestWithBody<UserUpdateModel, UserUriParamsModel>, res: Response) => {
+	const userId = req.params.id;
 	if (!userId) {
 		res.sendStatus(HTTP_STATUS.BAD_REQUEST_400);
 		return;
@@ -77,8 +69,8 @@ app.put('/users/:id', (req: Request, res: Response) => {
 	res.sendStatus(HTTP_STATUS.OK_200);
 });
 
-app.delete('/users/:id', (req: Request, res: Response) => {
-	const userId = req.params.id as string;
+app.delete('/users/:id', (req: RequestWithParams<UserUriParamsModel>, res: Response) => {
+	const userId = req.params.id;
 	if (!userId) {
 		res.sendStatus(HTTP_STATUS.BAD_REQUEST_400);
 		return;
