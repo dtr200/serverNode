@@ -1,8 +1,9 @@
 import {describe, it, expect} from '@jest/globals';
 import request from 'supertest';
-import {app} from '../../src/index.js';
-import {HTTP_STATUS} from '../../src/types.js';
-import {ENDPOINT, ERROR_URI, type DbUser, type UserCreator} from './types.js';
+import {app} from '../../src/app.js';
+import {ENDPOINT, HTTP_STATUS} from '../../src/types.js';
+import {ERROR_URI} from './types.js';
+import type {DbUser, UserCreator} from './types.js';
 
 describe('/users', () => {
 	const USER: UserCreator = {
