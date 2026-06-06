@@ -1,7 +1,7 @@
 import {db, type DbUser} from "../db/db.js";
 
 export const usersRepository = {
-	createUser(data: Omit<DbUser, 'id'>) {
+	async createUser(data: Omit<DbUser, 'id'>) {
 		const user = {
 			...data,
 			id: +(new Date),
@@ -9,7 +9,7 @@ export const usersRepository = {
 		db.users.push(user);
 		return user;
 	},
-	getUsersByName(name: string) {
+	async getUsersByName(name: string) {
 		const foundUsers = db.users.filter((u) =>
 			u.name.toLowerCase().indexOf(name.toLowerCase()) > -1
 		);
@@ -17,17 +17,17 @@ export const usersRepository = {
 		if (!foundUsers.length) return db.users;
 		return foundUsers;
 	},
-	getUserById(id: string) {
+	async getUserById(id: string) {
 		return db.users.find((u) => `${u.id}` === id);
 	},
-	updateUser(id: string, data: Partial<Omit<DbUser, 'id'>>) {
+	async updateUser(id: string, data: Partial<Omit<DbUser, 'id'>>) {
 		const user = usersRepository.getUserById(id);
 		if (!user) return false;
 
 		Object.assign(user, data);
 		return true;
 	},
-	deleteUserById(id: string) {
+	async deleteUserById(id: string) {
 		const hasUser = usersRepository.getUserById(id);
 		if (!hasUser) return false;
 

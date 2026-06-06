@@ -1,7 +1,7 @@
 import {db} from "../db/db.js";
 
 export const testRepository = {
-	clearDb() {
+	async clearDb() {
 		db.users = [];
 	},
 }

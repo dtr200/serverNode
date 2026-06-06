@@ -6,8 +6,8 @@ import type {Request, Response} from 'express';
 export const createTestRoutes = () => {
 	const router = express.Router();
 
-	router.delete('/', (req: Request, res: Response) => {
-		testRepository.clearDb();
+	router.delete('/', async (req: Request, res: Response) => {
+		await testRepository.clearDb();
 		res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
 	});
 
