@@ -1,7 +1,6 @@
 import express from 'express';
 import {HTTP_STATUS} from "../types.js";
 import {NUM_ONLY_REGEX} from './utils.js';
-import {usersRepository} from '../repository/usersRepository.js';
 import {body} from 'express-validator';
 import type {UserCreateModel} from "../models/userCreateModel.js";
 import type {UserQueryModel} from "../models/userQueryModel.js";
@@ -11,6 +10,7 @@ import type {UserViewModel} from "../models/userViewModel.js";
 import type {RequestWithBody, RequestWithParams, RequestWithQuery} from "../types.js";
 import type {Response} from 'express';
 import {inputValidationMiddleware} from '../middlewares/inputValidationMiddleware.js';
+import {usersService} from '../domain/usersService.js';
 
 export const createUserRoutes = () => {
 	const router = express.Router();
@@ -22,12 +22,12 @@ export const createUserRoutes = () => {
 		nameValidation,
 		inputValidationMiddleware,
 		async (req: RequestWithBody<UserCreateModel>, res: Response) => {
-			const user = await usersRepository.createUser({name: req.body.name});
+			const user = await usersService.createUser({name: req.body.name});
 			res.status(HTTP_STATUS.CREATED_201).json(user);
 	});
 	
 	router.get('/', async (req: RequestWithQuery<UserQueryModel>, res: Response<UserViewModel[]>) => {
-		const users = await usersRepository.getUsersByName(req.query.name || '');
+		const users = await usersService.getUsersByName(req.query.name || '');
 		return res.json(users);
 	});
 
@@ -36,7 +36,7 @@ export const createUserRoutes = () => {
 			res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
 			return;
 		}
-		const user = await usersRepository.getUserById(req.params.id);
+		const user = await usersService.getUserById(req.params.id);
 		if (!user) {
 			res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
 			return;
@@ -58,13 +58,13 @@ export const createUserRoutes = () => {
 				res.sendStatus(HTTP_STATUS.BAD_REQUEST_400);
 				return;
 			}
-			const updated = await usersRepository.updateUser(userId, {name: req.body.name});
+			const updated = await usersService.updateUser(userId, {name: req.body.name});
 			if (!updated) {
 				res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
 				return;
 			}
 
-			const user = await usersRepository.getUserById(userId);
+			const user = await usersService.getUserById(userId);
 			res.sendStatus(HTTP_STATUS.OK_200).json(user);
 	});
 	
@@ -73,7 +73,7 @@ export const createUserRoutes = () => {
 			res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
 			return;
 		}
-		const deleted = await usersRepository.deleteUserById(req.params.id);
+		const deleted = await usersService.deleteUserById(req.params.id);
 		if (!deleted) {
 			res.sendStatus(HTTP_STATUS.BAD_REQUEST_400);
 			return;

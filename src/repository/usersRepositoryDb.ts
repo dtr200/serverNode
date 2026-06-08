@@ -1,15 +1,10 @@
-import {ObjectId, type Filter} from "mongodb";
+import {type Filter} from "mongodb";
 import {type DbUser} from "../db/db.js";
 import {userCollection} from "./db.js";
 
 export const usersRepositoryDb = {
-	async createUser(data: Omit<DbUser, 'id'>) {
-		const user = {
-			...data,
-			id: +(new Date),
-		};
-		const result = await userCollection.insertOne(user);
-		return user;
+	async createUser(data: DbUser) {
+		return await userCollection.insertOne(data);
 	},
 	async getUsersByName(name: string) {
 		const filter: Filter<DbUser> = {};
@@ -20,20 +15,18 @@ export const usersRepositoryDb = {
 
 		return userCollection.find(filter).toArray();
 	},
-	async getUserById(id: string) {
-		return userCollection.find({id: +id});
+	async getUserById(id: number) {
+		return userCollection.findOne({id});
 	},
-	async updateUser(id: string, data: Partial<Omit<DbUser, 'id'>>) {
+	async updateUser(id: number, data: Partial<Omit<DbUser, 'id'>>) {
 		const result = await userCollection.updateOne(
-			{id: +id},
+			{id},
 			{...data},
 		);
 		return result.matchedCount === 1;
 	},
-	async deleteUserById(id: string) {
-		const result = await userCollection.deleteOne(
-			{['_id']: new ObjectId(id)},
-		);
+	async deleteUserById(id: number) {
+		const result = await userCollection.deleteOne({id});
 		return result.deletedCount === 1;
 	},
 }
