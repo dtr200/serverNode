@@ -4,7 +4,7 @@ import {app} from '../../src/app.js';
 import {ENDPOINT, HTTP_STATUS} from '../../src/types.js';
 import {ERROR_URI} from './types.js';
 import type {UserCreator} from './types.js';
-import {DbUser} from '../../src/db/db.js';
+import type {DbUser} from '../../src/repository/db.js';
 
 describe('/users', () => {
 	const USER: UserCreator = {

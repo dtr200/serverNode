@@ -21,14 +21,14 @@ export const usersRepository = {
 		return db.users.find((u) => `${u.id}` === id);
 	},
 	async updateUser(id: string, data: Partial<Omit<DbUser, 'id'>>) {
-		const user = usersRepository.getUserById(id);
+		const user = await usersRepository.getUserById(id);
 		if (!user) return false;
 
 		Object.assign(user, data);
 		return true;
 	},
 	async deleteUserById(id: string) {
-		const hasUser = usersRepository.getUserById(id);
+		const hasUser = await usersRepository.getUserById(id);
 		if (!hasUser) return false;
 
 		db.users = db.users.filter((u) => `${u.id}` !== id);

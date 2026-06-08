@@ -1,1 +1,1 @@
-export const NUM_ONLY_REGEX = `^\\d+$`;
+export const NUM_ONLY_REGEX = /^\d+$/;

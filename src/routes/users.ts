@@ -31,7 +31,11 @@ export const createUserRoutes = () => {
 		return res.json(users);
 	});
 
-	router.get(`/:id(${NUM_ONLY_REGEX})`, async (req: RequestWithParams<UserUriParamsModel>, res: Response<UserViewModel>) => {
+	router.get(`/:id`, async (req: RequestWithParams<UserUriParamsModel>, res: Response<UserViewModel>) => {
+		if (!NUM_ONLY_REGEX.test(req.params.id)) {
+			res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
+			return;
+		}
 		const user = await usersRepository.getUserById(req.params.id);
 		if (!user) {
 			res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
@@ -41,10 +45,14 @@ export const createUserRoutes = () => {
 	});
 	
 	router.put(
-		`/:id(${NUM_ONLY_REGEX})`,
+		`/:id`,
 		nameValidation,
 		inputValidationMiddleware,
 		async (req: RequestWithBody<UserUpdateModel, UserUriParamsModel>, res: Response) => {
+			if (!NUM_ONLY_REGEX.test(req.params.id)) {
+				res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
+				return;
+			}
 			const userId = req.params.id;
 			if (!userId) {
 				res.sendStatus(HTTP_STATUS.BAD_REQUEST_400);
@@ -60,7 +68,11 @@ export const createUserRoutes = () => {
 			res.sendStatus(HTTP_STATUS.OK_200).json(user);
 	});
 	
-	router.delete(`/:id(${NUM_ONLY_REGEX})`, async (req: RequestWithParams<UserUriParamsModel>, res: Response) => {
+	router.delete(`/:id`, async (req: RequestWithParams<UserUriParamsModel>, res: Response) => {
+		if (!NUM_ONLY_REGEX.test(req.params.id)) {
+			res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
+			return;
+		}
 		const deleted = await usersRepository.deleteUserById(req.params.id);
 		if (!deleted) {
 			res.sendStatus(HTTP_STATUS.BAD_REQUEST_400);
